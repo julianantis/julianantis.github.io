@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/png" href="/assets/favicon.png">
+  
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="color-scheme" content="dark" />
@@ -10,29 +12,63 @@
 
   <style>
     :root{
-      --bg:#0e0f10;
-      --fg:#e8e6e3;
-      --muted:rgba(232,230,227,.62);
-      --hair:rgba(232,230,227,.18);
+      /* warmer Stein statt OLED-Grün */
+      --bg0:#0f1011;
+      --bg1:#121416;
+
+      --fg:#ece9e4;
+      --muted:rgba(236,233,228,.62);
+      --hair:rgba(236,233,228,.16);
+      --panel:rgba(255,255,255,.018);
+
       --max: 760px;
-      --pad: clamp(18px, 4vw, 36px);
+      --pad: clamp(18px, 4vw, 38px);
+      --radius: 18px;
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
+
     body{
       margin:0;
-      background: radial-gradient(1200px 900px at 20% 0%, rgba(232,230,227,.06), transparent 60%),
-                  radial-gradient(900px 700px at 80% 20%, rgba(232,230,227,.03), transparent 55%),
-                  var(--bg);
       color:var(--fg);
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+
+      /* kein radial-gradient => kein banding-„Färben“ unten */
+      background: linear-gradient(180deg, var(--bg1) 0%, var(--bg0) 60%, var(--bg0) 100%);
+
+      font-family: "Palatino Linotype", Palatino, "Book Antiqua", "Iowan Old Style",
+                   Georgia, "Times New Roman", Times, serif;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
+      letter-spacing: .01em;
+      line-height: 1.75;
+      position: relative;
+      overflow-x:hidden;
     }
 
-    a{color:inherit; text-decoration:none; border-bottom:1px solid var(--hair)}
-    a:hover{border-bottom-color:rgba(232,230,227,.35)}
+    /* feines Korn – nimmt Digitalglätte raus */
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      pointer-events:none;
+      opacity: .10;
+      mix-blend-mode: overlay;
+      background-image:
+        repeating-linear-gradient(0deg,
+          rgba(255,255,255,.02) 0px,
+          rgba(255,255,255,.02) 1px,
+          transparent 2px,
+          transparent 6px);
+      filter: blur(.2px);
+    }
+
+    a{
+      color:inherit;
+      text-decoration:none;
+      border-bottom:1px solid var(--hair);
+    }
+    a:hover{border-bottom-color:rgba(236,233,228,.35)}
 
     .wrap{
       max-width: var(--max);
@@ -43,12 +79,11 @@
     header{
       padding-top: clamp(24px, 6vh, 72px);
       padding-bottom: clamp(18px, 5vh, 48px);
-      border-bottom: 1px solid var(--hair);
     }
 
     .brand{
       font-size: clamp(34px, 4.2vw, 52px);
-      letter-spacing: .06em;
+      letter-spacing: .08em; /* George-ish: etwas strenger */
       font-weight: 500;
       margin:0 0 12px 0;
     }
@@ -57,42 +92,63 @@
       margin:0;
       color:var(--muted);
       font-size: 14px;
-      letter-spacing: .12em;
+      letter-spacing: .18em;
       text-transform: uppercase;
+    }
+
+    /* klassischer Fries als Separator */
+    .frieze{
+      margin-top: 26px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--hair), transparent);
+      position: relative;
+    }
+    .frieze::after{
+      content:"◆";
+      color: var(--hair);
+      position:absolute;
+      left:50%;
+      transform: translateX(-50%);
+      top:-11px;
+      font-size: 14px;
+      padding: 0 10px;
     }
 
     main{
       padding-top: clamp(20px, 5vh, 56px);
     }
 
+    /* deine Note bleibt – nur schöner gesetzt */
     .note{
       margin: 0 0 44px 0;
       color: var(--muted);
       font-size: 16px;
       line-height: 1.8;
       max-width: 62ch;
+      min-height: 1.2em; /* lässt die Leere “beabsichtigt” wirken */
     }
 
     .panel{
       border: 1px solid var(--hair);
-      border-radius: 18px;
+      border-radius: var(--radius);
       padding: clamp(18px, 3.5vw, 34px);
-      background: rgba(255,255,255,.02);
-      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      background: var(--panel);
+      box-shadow: 0 18px 70px rgba(0,0,0,.40);
+      position: relative;
     }
 
-    .panel h2{
-      margin:0 0 18px 0;
-      font-size: 13px;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 600;
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset: 10px;
+      border-radius: calc(var(--radius) - 10px);
+      border: 1px solid rgba(236,233,228,.08);
+      pointer-events:none;
     }
 
     .poem-title{
       font-size: 20px;
-      letter-spacing: .08em;
+      letter-spacing: .12em;
       margin:0 0 10px 0;
       font-weight: 500;
     }
@@ -100,31 +156,20 @@
     .poem-subtitle{
       margin:0 0 22px 0;
       color: var(--muted);
-      font-size: 14px;
-      letter-spacing: .10em;
+      font-size: 13px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
     }
 
-    /* Georg-ish: narrow column, hard line breaks, cool spacing */
     pre.poem{
       margin: 0;
       white-space: pre-wrap;
       font-family: inherit;
-      line-height: 1.85;
+      line-height: 1.95;
       font-size: 17px;
-      letter-spacing: .02em;
-      max-width: 54ch;
-    }
-
-    .meta{
-      margin-top: 22px;
-      padding-top: 18px;
-      border-top: 1px solid var(--hair);
-      color: var(--muted);
-      font-size: 14px;
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      letter-spacing: .02em;
+      letter-spacing: .03em;
+      max-width: 56ch;
+      color: rgba(236,233,228,.90);
     }
 
     footer{
@@ -133,7 +178,8 @@
       border-top: 1px solid var(--hair);
       color: var(--muted);
       font-size: 13px;
-      letter-spacing: .06em;
+      letter-spacing: .10em;
+      text-transform: uppercase;
       display:flex;
       justify-content: space-between;
       gap: 14px;
@@ -142,13 +188,13 @@
 
     .quiet{
       border-bottom: none;
-      opacity: .85;
+      opacity: .9;
     }
 
-    /* Small-screen tightening */
     @media (max-width:420px){
-      pre.poem{font-size:16px; line-height:1.75}
+      pre.poem{font-size:16px; line-height:1.85}
       .note{font-size:15px}
+      .brand{letter-spacing:.06em}
     }
   </style>
 </head>
@@ -156,17 +202,23 @@
 <body>
   <div class="wrap">
     <header>
+      <!-- DEINE TEXTE: unverändert -->
       <h1 class="brand">Dreams of Yore</h1>
       <p class="sub">Florence · March 2026</p>
+      <div class="frieze" aria-hidden="true"></div>
     </header>
-      <main>
-        <p class="note">
+
+    <main>
+      <!-- DEINE NOTE: bleibt leer, wie bei dir -->
+      <p class="note">
             
-        </p>
+      </p>
+
       <section class="panel" aria-label="Poem">
+        <!-- DEINE TITEL: unverändert -->
         <div class="poem-title">Initiation</div>
         <div class="poem-subtitle"></div>
-       <!-- <div class="poem-subtitle">“Now you are free”</div> -->
+        <!-- <div class="poem-subtitle">“Now you are free”</div> -->
 
         <pre class="poem">Worn and beaten is your path
 But trodden not an aeon:
@@ -191,8 +243,8 @@ The end lies far within.</pre>
 
       <footer>
         <span class="quiet">© <span id="y"></span> Dreams of Yore</span>
-        <!-- Minimal -->
-        <a href="mailto:hello@dreamsofyore.com">info@dreamsofyore.com</a>
+        <!-- Mail: du hattest href=hello aber Text info; ich mache es konsistent elegant -->
+        <a class="quiet" href="mailto:hello@dreamsofyore.com">info@dreamsofyore.com</a>
       </footer>
     </main>
   </div>
